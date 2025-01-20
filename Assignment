@@ -1,1 +1,118 @@
 
+import java.awt.*;
+import java.awt.event.*;
+
+public class SimpleCalculator implements ActionListener {
+    //The SimpleCalculator class implements the ActionListener interface to handle button click events.
+
+    Frame frame; // A window where the calculator components (display and buttons) are placed
+    TextField display; //Displays input numbers and results.
+    Button[] buttons;
+    String operator; //+,-,*,/,=,C
+    double firstNumber;//store the first number
+
+    SimpleCalculator() { //constructor
+
+        frame = new Frame("Mehedi's Calculator");//title of the frame
+        frame.setLayout(new BorderLayout());//for arranging display in the top and buttons in the center
+
+
+        display = new TextField();
+        display.setFont(new Font("Arial", Font.BOLD, 20));
+        display.setEditable(false);
+        frame.add(display, BorderLayout.NORTH);//arranged display in the top horizontally
+
+        String[] buttonLabels = {
+                "7", "8", "9", "/",
+                "4", "5", "6", "*",
+                "1", "2", "3", "-",
+                "0", "C", "=", "+"
+        };//lebeled the button
+
+
+        Panel buttonPanel = new Panel();
+        buttonPanel.setLayout(new GridLayout(4, 4, 5, 5));
+
+
+        buttons = new Button[16];
+        for (int i = 0; i < buttonLabels.length; i++) {
+            buttons[i] = new Button(buttonLabels[i]);//Create Button with Label
+            buttons[i].setFont(new Font("Arial", Font.BOLD, 18));//This line sets the font for each button
+            buttons[i].addActionListener(this);
+            buttons[i].setBackground(Color.LIGHT_GRAY);
+            if (buttonLabels[i].equals("=")) {
+                buttons[i].setBackground(Color.pink);
+            }
+            buttonPanel.add(buttons[i]);
+        }
+
+        frame.add(buttonPanel, BorderLayout.CENTER);
+
+
+        frame.setSize(300, 400);
+        frame.setVisible(true);
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);//window closing events to exit the program.
+            }
+        });
+    }
+
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String input = e.getActionCommand(); // Get the button text
+
+        switch (input) {
+            case "0", "1", "2", "3", "4", "5", "6", "7", "8", "9":
+                /* The actionPerformed method is triggered whenever a button is clicked.
+                The e.getActionCommand() retrieves the label of the clicked button and performs appropriate actions.*/
+                display.setText(display.getText() + input);
+                break;
+
+            case "C":
+                // If "C" is pressed, clear all input
+                display.setText("");
+                firstNumber = 0;
+                operator = null;
+                break;
+
+            case "=":
+                // If "=" is pressed, perform the calculation
+                if (operator != null) {
+                    double secondNumber = Double.parseDouble(display.getText());
+                    double result = performCalculation(firstNumber, secondNumber, operator);
+                    display.setText(String.valueOf(result));
+                    operator = null;
+                }
+                break;
+
+            case "+", "-", "*", "/":
+                // If an operator is pressed, store the first number and operator
+                firstNumber = Double.parseDouble(display.getText());
+                operator = input;
+                display.setText(""); // Clear the display for the next input
+                break;
+
+            default:
+
+                display.setText("Error");
+                break;
+        }
+    }
+
+
+    private double performCalculation(double num1, double num2, String op) {
+        return switch (op) {
+            case "+" -> num1 + num2;
+            case "-" -> num1 - num2;
+            case "*" -> num1 * num2;
+            case "/" -> num2 != 0 ? num1 / num2 : 0; // division by zero
+            default -> 0;
+        };
+    }
+
+    public static void main(String[] args) {
+        new SimpleCalculator();
+    }
+}
